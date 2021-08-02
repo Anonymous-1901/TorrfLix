@@ -1,0 +1,4 @@
+tpblite
+pyfiglet
+speechrecognition
+clipboard
