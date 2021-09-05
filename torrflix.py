@@ -1,42 +1,40 @@
+import time
 from tpblite import TPB
 import subprocess as s
 from pyfiglet import Figlet
 import os
-import speech_recognition as sr
+# import speech_recognition as sr
 import clipboard
 
 path = "E:\\torrflix_downloads"
 cache = "E:\\torrflix_cache"
 
-def listen():
-    with sr.Microphone() as source:
-        r = sr.Recognizer()
-        print("Say Movie name . . .")
-        data = r.listen(source, timeout=1, phrase_time_limit=4)
-        try:
-            speech = r.recognize_google(data)
-            print(speech)
-            return speech
-        except Exception as e:
-            print(e)
-
-
-# def next_episode(magnet, episode_no):
+# def listen():
+#     with sr.Microphone() as source:
+#         r = sr.Recognizer()
+#         print("Say Movie name . . .")
+#         data = r.listen(source, timeout=1, phrase_time_limit=4)
+#         try:
+#             speech = r.recognize_google(data)
+#             print(speech)
+#             return speech
+#         except Exception as e:
+#             print(e)
 
 
 def stream_movies():
     t = TPB()
-    try:
-        name = listen()
-        print("Searching :", name, "\n")
-        torrents = t.search(name)
-    except Exception as e:
-        print("Voice recognition cancelled \n")
-        name = input("Enter a movie/game/show name : ")
-        print("Searching :", name)
-        torrents = t.search(name)
+    name = input("Enter a movie/game/show name : ")
+    print("Searching :", name)
+    while True:
+        try:
+            torrents = t.search(name)
+            break
+        except ConnectionError:
+            print("Error connecting to the server , retrying . . . ")
+            time.sleep(1)
+            continue
 
-    # torrents = t.search(name)
     sr = 1
     print(
         "--------------------------------------------------------------------------------------------------------------------------------------------------------------------")
@@ -72,32 +70,47 @@ def stream_movies():
     if stream == 1:
         command = f"webtorrent download \"{magnet}\" --vlc -o E:\\torrflix_cache --not-on-top"
         s.run(command, shell=True)
+        cont = input("Press ENTER to continue or q to exit . . .")
+
 
     elif stream == 2:
         # print(str(torrents[selection]) + "\n" + magnet)
         command = f"webtorrent download \"{magnet}\" -o {path}"
         s.run(command, shell=True)
+        cont = input("Press ENTER to continue or q to exit . . .")
 
     elif stream == 3:
-        print("Getting file list . . .")
-        outt = s.run(f"webtorrent \"{magnet}\" -s -q", shell=True, capture_output=True, text=True)
-        episodes = outt.stdout
-        episodes = episodes.replace("To select a specific file, re-run `webtorrent` with \"--select [index]\"", '')
-        episodes = episodes.replace("Example: webtorrent download \"magnet:...\" --select 0", '')
-        episodes = episodes.replace("webtorrent is exiting...", '')
-        print(episodes)
-        episode_no = int(input("Choose an episode > "))
-        command = f"webtorrent download \"{magnet}\" -s {episode_no} --vlc -o E:\\torrflix_cache --not-on-top"
-        s.run(command, shell=True)
         while True:
-            next_epi = input("Play next episode ?y/n : ")
-            if next_epi == 'n':
-                cont = None
-                break
-
+            s.run("cls",shell=True)
+            print("Getting file list . . .")
+            outt = s.run(f"webtorrent \"{magnet}\" -s -q", shell=True, capture_output=True, text=True)
+            episodes = outt.stdout
+            episodes = episodes.replace("To select a specific file, re-run `webtorrent` with \"--select [index]\"", '')
+            episodes = episodes.replace("Example: webtorrent download \"magnet:...\" --select 0", '')
+            episodes = episodes.replace("webtorrent is exiting...", '')
+            episodes = episodes.replace("download",'stream')
+            print(episodes)
+            episode_no = int(input("Choose an episode > "))
+            command = f"webtorrent download \"{magnet}\" -s {episode_no} --vlc -o E:\\torrflix_cache --not-on-top"
+            s.run(command, shell=True)
+            while True:
+                next_epi = input("Play next episode ?y/n : , \nb to go back : ")
+                if next_epi == 'n':
+                    cont = None
+                    back = False
+                    break
+                    
+                elif next_epi == 'b':
+                    back = True
+                    break
+                else:
+                    episode_no += 1
+                    command = f"webtorrent download \"{magnet}\" -s {episode_no} --vlc -o E:\\torrflix_cache --not-on-top"
+                    s.run(command, shell=True)
+            if back:
+                continue
             else:
-                command = f"webtorrent download \"{magnet}\" -s {episode_no+1} --vlc -o E:\\torrflix_cache --not-on-top"
-                s.run(command, shell=True)
+                break
     return cont
 
 
