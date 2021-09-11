@@ -3,28 +3,35 @@ from tpblite import TPB
 import subprocess as s
 from pyfiglet import Figlet
 import os
-# import speech_recognition as sr
+import speech_recognition as sr
 import clipboard
 
 path = "E:\\torrflix_downloads"
 cache = "E:\\torrflix_cache"
 
-# def listen():
-#     with sr.Microphone() as source:
-#         r = sr.Recognizer()
-#         print("Say Movie name . . .")
-#         data = r.listen(source, timeout=1, phrase_time_limit=4)
-#         try:
-#             speech = r.recognize_google(data)
-#             print(speech)
-#             return speech
-#         except Exception as e:
-#             print(e)
+def listen():
+    with sr.Microphone() as source:
+        r = sr.Recognizer()
+        print("Say Movie name . . .")
+        data = r.listen(source, timeout=1, phrase_time_limit=4)
+        try:
+            speech = r.recognize_google(data)
+            print(speech)
+            return speech
+        except Exception as e:
+            print(e)
 
 
-def stream_movies():
+def stream_movies(*args):
+    if not args:
+        try:
+            name = listen()
+        except:
+            print("Voice recognition cancelled")
+            name = input("Enter a movie/game/show name : ")
+    else:
+        name=args[0]
     t = TPB()
-    name = input("Enter a movie/game/show name : ")
     print("Searching :", name)
     while True:
         try:
@@ -171,7 +178,14 @@ if __name__ == '__main__':
         s.run("cls", shell=True)
         print(f.renderText("TORRFLIX"))
         print("1.Stream/Download Movies \n2.Download Torrents \n3.Browse Downloads\n4.Wishlist\n5.Clear cache\n")
-        option = int(input("Choose a option > "))
+        option = input("Search a movie directly or Choose a option > ")
+        try:
+            option = int(option)
+        except ValueError:
+            cont = stream_movies(option)
+            if cont == 'q':
+                exit()
+
         if option == 1:
             cont = stream_movies()
             if cont == 'q':
