@@ -38,8 +38,7 @@ def stream_movies(*args):
             torrents = t.search(name)
             break
         except ConnectionError:
-            print("Error connecting to the server , retrying . . . ")
-            time.sleep(1)
+            time.sleep(0.5)
             continue
 
     sr = 1
