@@ -10,7 +10,7 @@ A simple dirty python script to stream or download torrents which uses webtorren
  ## Installation :
  
     npm install webtorrent -g
-    pip install requirements.txt
+    pip install -r requirements.txt
     
     
  - Change the downloads and cache path as you like (first lines of code) . 
