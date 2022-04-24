@@ -6,8 +6,16 @@ import os
 import speech_recognition as sr
 import clipboard
 
+#Edit the path here
 path = "E:\\torrflix_downloads"
 cache = "E:\\torrflix_cache"
+
+if os.path.isdir(path)==os.path.isdir(cache)==False:
+    print("Nope not there")
+    os.mkdir(path)
+    print("Path created")
+    os.mkdir(cache)
+    print("Cache created")
 
 def listen():
     with sr.Microphone() as source:
